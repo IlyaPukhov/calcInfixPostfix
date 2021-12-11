@@ -3,31 +3,31 @@ import kotlin.math.sin
 
 class Operations {
     fun infixToPostfix(infixExpr: List<String>): List<String> {
-        val operators = mutableListOf<String>()
-        val postfix = mutableListOf<String>()
+        val stackOperators = mutableListOf<String>() // создаём стек для операторов
+        val postfix = mutableListOf<String>() // создаем очередь для чисел ( => и результата)
         infixExpr.forEach {
             when {
-                Regex("[\\d]").containsMatchIn(it) ->
-                    postfix.add(it)
-                it == "(" ->
-                    operators.add(it)
-                it == ")" -> {
-                    while (operators.isNotEmpty() && operators.last() != "(")
-                        postfix.add(operators.removeLast())
-                    operators.removeLast()
+                Regex("[\\d]").containsMatchIn(it) -> // если данный элемент выражения число
+                    postfix.add(it) // то добавляем его в очередь
+                it == "(" -> // если данный элемент выражения открывающая скобка
+                    stackOperators.add(it) // то добавляем её в стек
+                it == ")" -> { // если данный элемент выражения закрывающая скобка
+                    while (stackOperators.isNotEmpty() && stackOperators.last() != "(") // пока стек не пустой и последний элемент не открывающая скобка
+                        postfix.add(stackOperators.removeLast()) // pop в очередь оператора из стека
+                    stackOperators.removeLast() // удаляем из стека открывающую скобку
                 }
-                else -> {
-                    while (operators.isNotEmpty() && priority(it) <= priority(operators.last())) {
-                        postfix.add(operators.removeLast())
+                else -> { // в остальных случаях
+                    while (stackOperators.isNotEmpty() && priority(it) <= priority(stackOperators.last())) { // пока стек не пустой и приоритет данной операции ниже приоритета операции из стека
+                        postfix.add(stackOperators.removeLast()) // pop в очередь оператора из стека
                     }
-                    operators.add(it)
+                    stackOperators.add(it) // добавляем данный оператор в стек
                 }
             }
         }
-        // Когда перебрали все элементы выражения, то добавляем из стека операторы в очередь
-        while (operators.isNotEmpty()) {
-            if (operators.last() == "(") throw Error("Неверное выражение!")
-            postfix.add(operators.removeLast())
+        // Когда перебрали все элементы выражения, то добавляем операторы из стека в очередь
+        while (stackOperators.isNotEmpty()) {
+            if (stackOperators.last() == "(") throw Error("Неверное выражение!")
+            postfix.add(stackOperators.removeLast())
         }
         return postfix
     }
@@ -81,16 +81,16 @@ class Operations {
     }
 
     fun calcInfixEx(expr: List<String>): Float {
-        return calcPostfixEx(infixToPostfix(expr))
+        return calcPostfixEx(infixToPostfix(expr)) // Преобразуем инфиксное выражение в постфиксное и вычисляем его значение
     }
 }
 
-fun parseEx(expr: String): List<String> {
+fun parseExpr(expr: String): List<String> {
     val pattern = "-?(\\d+\\.)?\\d+|\\(|\\)|\\+|-|\\*|/|\\^|sin".toRegex()
     return pattern.findAll(expr).map { it.value }.toList()
 }
 
-fun priority(operand: String): Int = when (operand) {
+fun priority(operator: String): Int = when (operator) {
     "+", "-" -> 1
     "*", "/" -> 2
     "^" -> 3
