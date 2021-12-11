@@ -17,7 +17,7 @@ class Operations {
                     stackOperators.removeLast() // удаляем из стека открывающую скобку
                 }
                 else -> { // в остальных случаях
-                    while (stackOperators.isNotEmpty() && priority(it) <= priority(stackOperators.last())) { // пока стек не пустой и приоритет данной операции ниже приоритета операции из стека
+                    while (stackOperators.isNotEmpty() && priority(it) <= priority(stackOperators.last())) { // пока стек не пустой и приоритет данной операции не превыщает приоритета операции из стека
                         postfix.add(stackOperators.removeLast()) // pop в очередь оператора из стека
                     }
                     stackOperators.add(it) // добавляем данный оператор в стек
