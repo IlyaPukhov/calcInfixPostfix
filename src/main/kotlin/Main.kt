@@ -15,12 +15,12 @@ fun main() {
             "Введите номер нужной вам операции: ")
 
     val mode: String = readLine().toString()
-    when {
-        mode.contains("1") ->
+    when (mode.toInt()){
+        1 ->
             println("Постфиксная форма записи заданного выражения: ${Operations().infixToPostfix(stringExpr)}")
-        mode.contains("2") ->
+        2 ->
             println("Значение постфиксного выражения: ${Operations().calcPostfixExpr(stringExpr)}")
-        mode.contains("3") ->
+        3 ->
             println("Результат: ${Operations().calcInfixExpr(stringExpr)}")
         else ->
             throw Error("Ошибка! Попробуйте ещё раз.")

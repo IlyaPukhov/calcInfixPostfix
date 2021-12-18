@@ -4,22 +4,23 @@ import kotlin.math.sin
 class Operations {
     fun infixToPostfix(infixString: String): String {
         val infixExpr = parseExpr(infixString)
-        val stackOperators = mutableListOf<String>()
-        val postfix = mutableListOf<String>()
+        val stackOperators = mutableListOf<String>() // LIFO
+        val postfix = mutableListOf<String>() // FIFO
         infixExpr.forEach {
             when {
                 Regex("[\\d]").containsMatchIn(it) ->
                     postfix.add(it)
                 it == "(" ->
                     stackOperators.add(it)
-                it == ")" -> { // Добавляем в стек все операторы от последнего в стеке пока не дойдем до открывающей скобки
+                it == ")" -> { // Добавляем в postfix все операторы от последнего в стеке пока не дойдем до открывающей скобки
                     while (stackOperators.isNotEmpty() && stackOperators.last() != "(")
                         postfix.add(stackOperators.removeLast())
                     stackOperators.removeLast() // '(' удаляем
                 }
                 else -> { // Сравниваем приоритет последнего оператора с данным
                     while (stackOperators.isNotEmpty() && priority(it) <= priority(stackOperators.last())) {
-                        postfix.add(stackOperators.removeLast())
+                        if (stackOperators.last() == "(") break
+                        else postfix.add(stackOperators.removeLast())
                     }
                     stackOperators.add(it)
                 }
