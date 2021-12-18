@@ -6,7 +6,7 @@ fun main() {
             "Сложение(+), Вычитание(-), Умножение(*), Деление(/), Возведение в степень(^), Нахождение синуса (sin)")
 
     print("Входное выражение: ")
-    val expr: String = readLine().toString()
+    val stringExpr: String = readLine().toString()
 
     print("Что вы хотите сделать с данным выражением?\n" +
             "1) Преобразовать инфиксное выражение в постфиксное\n" +
@@ -17,11 +17,11 @@ fun main() {
     val mode: String = readLine().toString()
     when {
         mode.contains("1") ->
-            println("Постфиксная форма записи заданного выражения: ${Operations().infixToPostfix(parseExpr(expr)).joinToString(" ")}")
+            println("Постфиксная форма записи заданного выражения: ${Operations().infixToPostfix(stringExpr)}")
         mode.contains("2") ->
-            println("Значение постфиксного выражения: ${Operations().calcPostfixEx(parseExpr(expr))}")
+            println("Значение постфиксного выражения: ${Operations().calcPostfixExpr(stringExpr)}")
         mode.contains("3") ->
-            println("Значение инфиксного выражения: ${Operations().calcInfixEx(parseExpr(expr))}")
+            println("Результат: ${Operations().calcInfixExpr(stringExpr)}")
         else ->
             throw Error("Ошибка! Попробуйте ещё раз.")
     }

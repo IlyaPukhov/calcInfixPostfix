@@ -2,25 +2,26 @@ import kotlin.math.pow
 import kotlin.math.sin
 
 class Operations {
-    fun infixToPostfix(infixExpr: List<String>): List<String> {
-        val stackOperators = mutableListOf<String>() // создаём стек для операторов
-        val postfix = mutableListOf<String>() // создаем очередь для чисел ( => и результата)
+    fun infixToPostfix(infixString: String): String {
+        val infixExpr = parseExpr(infixString)
+        val stackOperators = mutableListOf<String>()
+        val postfix = mutableListOf<String>()
         infixExpr.forEach {
             when {
-                Regex("[\\d]").containsMatchIn(it) -> // если данный элемент выражения число
-                    postfix.add(it) // то добавляем его в очередь
-                it == "(" -> // если данный элемент выражения открывающая скобка
-                    stackOperators.add(it) // то добавляем её в стек
-                it == ")" -> { // если данный элемент выражения закрывающая скобка
-                    while (stackOperators.isNotEmpty() && stackOperators.last() != "(") // пока стек не пустой и последний элемент не открывающая скобка
-                        postfix.add(stackOperators.removeLast()) // pop в очередь оператора из стека
-                    stackOperators.removeLast() // удаляем из стека открывающую скобку
+                Regex("[\\d]").containsMatchIn(it) ->
+                    postfix.add(it)
+                it == "(" ->
+                    stackOperators.add(it)
+                it == ")" -> { // Добавляем в стек все операторы от последнего в стеке пока не дойдем до открывающей скобки
+                    while (stackOperators.isNotEmpty() && stackOperators.last() != "(")
+                        postfix.add(stackOperators.removeLast())
+                    stackOperators.removeLast() // '(' удаляем
                 }
-                else -> { // в остальных случаях
-                    while (stackOperators.isNotEmpty() && priority(it) <= priority(stackOperators.last())) { // пока стек не пустой и приоритет данной операции не превыщает приоритета операции из стека
-                        postfix.add(stackOperators.removeLast()) // pop в очередь оператора из стека
+                else -> { // Сравниваем приоритет последнего оператора с данным
+                    while (stackOperators.isNotEmpty() && priority(it) <= priority(stackOperators.last())) {
+                        postfix.add(stackOperators.removeLast())
                     }
-                    stackOperators.add(it) // добавляем данный оператор в стек
+                    stackOperators.add(it)
                 }
             }
         }
@@ -29,46 +30,47 @@ class Operations {
             if (stackOperators.last() == "(") throw Error("Неверное выражение!")
             postfix.add(stackOperators.removeLast())
         }
-        return postfix
+        return postfix.joinToString(" ")
     }
 
-    fun calcPostfixEx(expr: List<String>): Float {
-        val st = mutableListOf<Float>() // Создаём стек для чисел
+    fun calcPostfixExpr(postfixString: String): Float {
+        val expr = parseExpr(postfixString)
+        val st = mutableListOf<Float>()
         var r: Float
         var l: Float
         expr.forEach {
             try {
-                when (it) { // Проходимся по всем элементам массива
-                    "+" -> {  // Если встречается "+", то вынимаем 2 последних числа из стека и добавляем в конец их сумму
+                when (it) {
+                    "+" -> {
                         r = st.removeLast()
                         l = st.removeLast()
                         st.add(l + r)
                     }
-                    "-" -> { // Если встречается "-", то вынимаем 2 последних числа из стека и добавляем в него их разность
+                    "-" -> {
                         r = st.removeLast()
                         l = st.removeLast()
                         st.add(l - r)
                     }
-                    "*" -> {  // Если встречается "*", то вынимаем 2 последних числа из стека и добавляем в него их произведение
+                    "*" -> {
                         r = st.removeLast()
                         l = st.removeLast()
                         st.add(l * r)
                     }
-                    "/" -> {  // Если встречается "/", то вынимаем 2 последних числа из стека и добавляем в конец их частное
+                    "/" -> {
                         r = st.removeLast()
                         l = st.removeLast()
                         st.add(l / r)
                     }
-                    "^" -> { // Если встречается "^", то вынимаем 2 последних числа из стека и добавляем в конец предпоследнее число в степени последнего
+                    "^" -> {
                         r = st.removeLast()
                         l = st.removeLast()
                         st.add(l.pow(r))
                     }
-                    "sin" -> { // Если встречается "sin", то вынимаем последнее число из стека и добавляем в конец sin от него
+                    "sin" -> {
                         r = st.removeLast()
                         st.add(sin(r))
                     }
-                    else -> st.add(it.toFloat()) // В остальных случаях добавляем число в стек
+                    else -> st.add(it.toFloat())
                 }
             } catch (e: NoSuchElementException) { // Если количество чисел в стеке недостаточно для операции, выдаём ошибку
                 throw Error("Неверное выражение!")
@@ -80,8 +82,11 @@ class Operations {
         return st[0] // Если в стеке осталось 1 число, то возвращаем его (это и есть результат выражения)
     }
 
-    fun calcInfixEx(expr: List<String>): Float {
-        return calcPostfixEx(infixToPostfix(expr)) // Преобразуем инфиксное выражение в постфиксное и вычисляем его значение
+    fun calcInfixExpr(infixString: String): Float {
+        val postfixExpr = infixToPostfix(infixString)
+        println("Преобразуем инфиксную форму записи в постфиксную: $postfixExpr\n" +
+        "Считаем значение постфиксного выражения...")
+        return calcPostfixExpr(postfixExpr)
     }
 }
 
